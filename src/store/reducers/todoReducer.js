@@ -1,7 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid'
 import { CREATE_TODO } from '../actionTypes'
-const initialState = {
+export const initialState = {
     todos: [
         {
             id: uuidv4(),

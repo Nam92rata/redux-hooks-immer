@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import { actions, selectors } from './store/todoActions';
+import React, { useState, useReducer, use } from 'react';
+import { actions } from './store/todoActions';
+import todoReducer, { initialState } from './store/reducers/todoReducer';
+import { todoContext } from './todoContext';
 import './App.css';
 
-function App({ todos, addTodo }) {
+function App() {
+  const [state, dispatch] = useReducer(todoReducer, initialState);
   const [newTodo, setNewTodo] = useState("");
 
   const onChangeHandler = (e) => {
@@ -12,42 +14,35 @@ function App({ todos, addTodo }) {
 
   const onClickHandler = (e) => {
     e.preventDefault();
-    addTodo(newTodo);
+    dispatch(actions.addTodo(newTodo));
   }
   return (
-    <div className="App">
-      <header className="App-header">
-        Todo App
+    <todoContext.Provider value={state}>
+      <div className="App">
+        <header className="App-header">
+          Todo App
         <input
-          onChange={onChangeHandler}
-          name={"title"}
-        /><button
-          onClick={onClickHandler}>Add</button>
+            onChange={onChangeHandler}
+            name={"title"}
+          /><button
+            onClick={onClickHandler}>Add</button>
         Todo List
         <ul>
-          {todos.map(el => {
-            return (
-              <li key={el.id}>{el.title}</li>
-            )
-          })}
-        </ul>
-      </header>
-    </div>
+            {state.todos.map(el => {
+              return (
+                <li key={el.id}>{el.title}</li>
+              )
+            })}
+          </ul>
+        </header>
+
+      </div>
+
+    </todoContext.Provider>
+
   );
 }
 
-const mapStateToProps = state => {
-  console.log("todos", state);
-  const todos = selectors.selectTodos(state)
-  return { todos }
-}
-
-const mapDispatchToProps = dispatch => ({
-  addTodo: data => dispatch(actions.addTodo(data))
-})
+export default App;
 
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(App)
