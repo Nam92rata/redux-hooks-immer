@@ -1,6 +1,8 @@
 
 import { v4 as uuidv4 } from 'uuid'
 import { CREATE_TODO } from '../actionTypes'
+import produce from "immer";
+
 const initialState = {
     todos: [
         {
@@ -15,11 +17,9 @@ export default (state = initialState, action) => {
     switch (action.type) {
         case CREATE_TODO:
             return {
-                ...state,
-                todos: [
-                    ...state.todos,
-                    action.data
-                ]
+                todos: produce(state.todos, draftState => {
+                    draftState.push(action.data)
+                })
             }
         default:
             return state
