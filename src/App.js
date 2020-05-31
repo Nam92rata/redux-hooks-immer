@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
+import { actions, selectors } from './store/todoActions';
 import './App.css';
 
-function App() {
+function App({ todos, addTodo }) {
+  const [newTodo, setNewTodo] = useState("");
+
+  const onChangeHandler = (e) => {
+    setNewTodo({ [e.target.name]: e.target.value })
+  }
+
+  const onClickHandler = (e) => {
+    e.preventDefault();
+    addTodo(newTodo);
+  }
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        Todo App
+        <input
+          onChange={onChangeHandler}
+          name={"title"}
+        /><button
+          onClick={onClickHandler}>Add</button>
+        Todo List
+        <ul>
+          {todos.map(el => {
+            return (
+              <li key={el.id}>{el.title}</li>
+            )
+          })}
+        </ul>
       </header>
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = state => {
+  console.log("todos", state);
+  const todos = selectors.selectTodos(state)
+  return { todos }
+}
+
+const mapDispatchToProps = dispatch => ({
+  addTodo: data => dispatch(actions.addTodo(data))
+})
+
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
