@@ -1,12 +1,10 @@
 import React, { useState, useReducer, use } from 'react';
-import { actions } from './store/todoActions';
-import todoReducer, { initialState } from './store/reducers/todoReducer';
-import { todoContext } from './todoContext';
+import { useImmer } from 'use-immer';
 import './App.css';
 
 function App() {
-  const [state, dispatch] = useReducer(todoReducer, initialState);
   const [newTodo, setNewTodo] = useState("");
+  const [todos, setTodos] = useImmer([]);
 
   const onChangeHandler = (e) => {
     setNewTodo({ [e.target.name]: e.target.value })
@@ -14,31 +12,30 @@ function App() {
 
   const onClickHandler = (e) => {
     e.preventDefault();
-    dispatch(actions.addTodo(newTodo));
+    setTodos(draft => {
+      draft.push(newTodo);
+    });
   }
   return (
-    <todoContext.Provider value={state}>
-      <div className="App">
-        <header className="App-header">
-          Todo App
+    <div className="App">
+      <header className="App-header">
+        Todo App
         <input
-            onChange={onChangeHandler}
-            name={"title"}
-          /><button
-            onClick={onClickHandler}>Add</button>
+          onChange={onChangeHandler}
+          name={"title"}
+        /><button
+          onClick={onClickHandler}>Add</button>
         Todo List
         <ul>
-            {state.todos.map(el => {
-              return (
-                <li key={el.id}>{el.title}</li>
-              )
-            })}
-          </ul>
-        </header>
+          {todos.map((el, index) => {
+            return (
+              <li key={index}>{el.title}</li>
+            )
+          })}
+        </ul>
+      </header>
 
-      </div>
-
-    </todoContext.Provider>
+    </div>
 
   );
 }
